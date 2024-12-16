@@ -2,9 +2,11 @@ import styled from 'styled-components/native';
 import { router } from 'expo-router';
 import colors from '@/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { useQuery } from '@realm/react';
+import { useQuery, useRealm } from '@realm/react';
 import Feeling from '@/schema/feeling';
-import { FlatList } from 'react-native';
+import { FlatList, TouchableOpacity } from 'react-native';
+import { ObjectID } from 'bson';
+import { useEffect } from 'react';
 
 const View = styled.View`
   flex: 1;
@@ -50,8 +52,20 @@ const Separator = styled.View`
 `;
 
 export default function Home() {
-  const feelings = useQuery(Feeling);
-  // const happy = feelings.filtered('emotion == "-"');
+  const realm = useRealm();
+  const feelings = useQuery(Feeling, collection => collection.sorted('_id', true));
+  const onPress = (id: ObjectID) => {
+    const toDelete = realm.objects(Feeling).filtered('_id == $0', id);
+
+    realm.write(() => {
+      realm.delete(toDelete);
+    });
+  };
+
+  useEffect(() => {
+    // layout animation 후 앱 비정상 종료되서 주석 처리함.
+    //   LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+  }, []);
 
   return (
     <View>
@@ -62,10 +76,12 @@ export default function Home() {
         ItemSeparatorComponent={Separator}
         keyExtractor={feeling => feeling._id + ''}
         renderItem={({ item }: { item: Feeling }) => (
-          <Record>
-            <Emotion>{item.emotion}</Emotion>
-            <Message>{item.message}</Message>
-          </Record>
+          <TouchableOpacity onPress={() => onPress(item._id)}>
+            <Record>
+              <Emotion>{item.emotion}</Emotion>
+              <Message>{item.message}</Message>
+            </Record>
+          </TouchableOpacity>
         )}
       />
       <Btn onPress={() => router.navigate('/write')}>

@@ -2,6 +2,10 @@ import styled from 'styled-components/native';
 import colors from '@/colors';
 import { useState } from 'react';
 import { Alert } from 'react-native';
+import { useRealm } from '@realm/react';
+import Feeling from '@/schema/feeling';
+import { BSON } from 'realm';
+import { useRouter } from 'expo-router';
 
 const View = styled.View`
   background-color: ${colors.bgColor};
@@ -54,6 +58,9 @@ const EmotionText = styled.Text`
 const emotions = ['🤯', '🥲', '🤬', '🤗', '🥰', '😊', '🤩'];
 
 export default function Write() {
+  const realm = useRealm();
+  const router = useRouter();
+
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
   const [feelings, setFeelings] = useState('');
   const onChangeText = (text: string) => setFeelings(text);
@@ -62,6 +69,16 @@ export default function Write() {
     if (feelings === '' || selectedEmotion === null) {
       return Alert.alert('Please complete form.');
     }
+
+    realm.write(() => {
+      realm.create(Feeling, {
+        _id: new BSON.ObjectId(),
+        emotion: selectedEmotion,
+        message: feelings,
+      });
+    });
+
+    router.back();
   };
   return (
     <View>

@@ -2,9 +2,6 @@ import styled from 'styled-components/native';
 import { router } from 'expo-router';
 import colors from '@/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect } from 'react';
-import { useQuery, useRealm } from '@realm/react';
-import Feeling from '@/schema/feeling';
 
 const View = styled.View`
   flex: 1;
@@ -33,14 +30,6 @@ const BtnText = styled.Text`
 `;
 
 export default function Home() {
-  const realm = useRealm();
-  const feeling = useQuery(Feeling);
-
-  useEffect(() => {
-    console.log('realm ::: ', realm);
-    console.log('feeling ::: ', feeling);
-  }, []);
-
   return (
     <View>
       <Title>My journal</Title>

@@ -9,7 +9,7 @@ export default class Feeling extends Realm.Object {
     name: 'Feeling',
     primaryKey: '_id',
     properties: {
-      _id: 'int',
+      _id: 'objectId',
       emotion: 'string',
       message: 'string',
     },
